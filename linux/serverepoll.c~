@@ -26,10 +26,6 @@ typedef int socket_t;
 int fdsbuffer[MAXFD];
 
 
-int isConn=-1;//用来表示是否连接了服务器B
-
-
-
 //接收客户端发来的数据
 //并且线程A把数据放到这边，线程B来读,并发送到服务器上
 int sendbuffer[MAXLINE];
@@ -290,41 +286,11 @@ void *pthreadAProc(void *param)
 
 void readsendBuffer(char *buf)
 {
-    //从缓冲区读数据 
-    enter_lock(sendbufferlock);   
-
-    memcpy(buf, sendbuf, sizeof(sendbuf)); 
-    memset(&sendbuf,0,sizeof(sendbuf));
-
-    leave_lock(sendbufferlock);
-}
-
-socket_t conn()
-{
-	socket_t s = socket(AF_INET, SOCK_STREAM, 0);
-	if (s == -1)
-	{
-		return s;
-	}	
-
-	// connect
-	struct sockaddr_in _sockaddr;
-	memset(&_sockaddr, 0, sizeof(_sockaddr));
-	_sockaddr.sin_family = AF_INET;
-	_sockaddr.sin_port = htons(9999);
-	_sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-	int ret = connect(s, (struct  sockaddr *)&_sockaddr, sizeof(_sockaddr));
-	if (ret != 0)
-	{
-		socket_close(s);
-		return -1;
-	}
 	
-	isConn=0;
-	return s;
-}
+	
+	
 
+}
 
 //线程B是一个客户端，先连接服务器B，然后不断地读写sendBuffer
 void *pthreadBProc(void *param)
@@ -332,14 +298,9 @@ void *pthreadBProc(void *param)
 	char buf[MAXLINE];
 	while(1)
 	{
-		if(isConn==-1)
-			s=conn();
-
 		memset(&buf,0,sizeof(buf));
-		//读出数据后把数据发送到另一个服务器B上
 		readsendBuffer(buf);
-		
-		write(s,buf,sizeof(buf));
+
 		
 		sleep(1);
 	}

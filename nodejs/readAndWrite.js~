@@ -1,0 +1,31 @@
+﻿var lineReader=require('line-reader');
+var fs=require('fs');
+var iconv=require('iconv-lite');
+
+function writefile(file,str)
+{
+	
+	var arr=iconv.encode(str,'utf-8');
+
+
+	fs.appendFile(file,arr,function(err){
+	//fs.writeFile(file,arr,function(err){
+		if(err)
+			console.log("fail"+err);
+	});
+	console.log("ok");
+
+	
+}
+
+
+
+lineReader.eachLine('code2.xml', function(line){  
+var file="centername.txt"
+
+var index1=line.indexOf(">");
+var index2=line.indexOf("<");
+var str='admin.'+line.substring(index1+1,index2)+'.dqy.ate.cn'+'\n';
+writefile(file,str);
+
+});
